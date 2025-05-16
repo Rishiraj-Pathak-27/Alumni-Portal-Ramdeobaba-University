@@ -23,5 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
     script.async = true;
     document.body.appendChild(script);
   }
+
+// Move logout event listener inside DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  const logout = document.getElementById('logout');
+  if (logout) {
+    logout.addEventListener('click', function (e) {
+      e.preventDefault(); // Prevent default link behavior if any
+      alert('Logging out...');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1000); // 1 second delay
+    });
+  }
+});
+  
   
   

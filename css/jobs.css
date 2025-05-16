@@ -285,14 +285,14 @@ main {
   }
 }
 
-/* Larger screens - two column layout */
+
 @media (min-width: 1200px) {
   #jobContainer {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Dark mode specific adjustments */
+
 .dark .job-card {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
@@ -301,7 +301,6 @@ main {
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Job filter section */
 .job-filters {
   margin-bottom: 2rem;
   padding: 1rem;
@@ -361,3 +360,24 @@ main {
   border: none;
   cursor: pointer;
 }
+
+.job-card a{
+  text-decoration: none;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+ margin-top: 1.5em;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.job-card a:hover{
+  background-color: var(--accent);
+  color: white;
+}
+

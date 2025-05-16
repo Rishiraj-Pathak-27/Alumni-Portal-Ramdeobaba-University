@@ -23,7 +23,7 @@ async function loadForumPosts() {
     }
   } catch (error) {
     console.error('Error fetching forum posts:', error);
-    alert('Failed to load forum posts. Please try again later.');
+   
   }
 }
 

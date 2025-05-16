@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         preloader.style.opacity = '0';
         setTimeout(() => {
           preloader.style.display = 'none';
-        }, 500);
-      }, 500);
+        }, 3000);
+      }, 3000);
     });
   }
 

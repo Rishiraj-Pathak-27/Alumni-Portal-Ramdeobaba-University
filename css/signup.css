@@ -29,17 +29,7 @@ main {
   position: relative;
 }
 
-.signup-container h2::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  border-radius: 3px;
-}
+
 
 .signup-container .form-group {
   margin-bottom: 1.5rem;
@@ -75,34 +65,7 @@ main {
   resize: vertical;
 }
 
-/* 3D Form Effect */
-.signup-container {
-  transform-style: preserve-3d;
-  perspective: 1000px;
-  transition: transform 0.5s ease;
-}
 
-.signup-container:hover {
-  transform: translateY(-5px) rotateX(3deg);
-}
-
-.signup-container::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, var(--primary), var(--accent));
-  z-index: -1;
-  border-radius: calc(var(--radius) + 2px);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.signup-container:hover::before {
-  opacity: 1;
-}
 
 /* Input animation */
 .form-group {

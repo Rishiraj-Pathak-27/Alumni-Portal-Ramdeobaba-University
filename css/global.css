@@ -98,6 +98,10 @@ nav ul li a {
   padding: 0.5rem 0;
 }
 
+nav ul #logout{
+  
+}
+
 nav ul li a::after {
   content: '';
   position: absolute;
@@ -229,6 +233,7 @@ input:focus, textarea:focus {
   animation: spin 1s linear infinite;
 }
 
+
 @keyframes spin {
   100% {
     transform: rotate(360deg);
@@ -255,7 +260,7 @@ input:focus, textarea:focus {
   }
 }
 
-/* 3D Elements Container */
+
 .scene-container {
   position: absolute;
   top: 0;
@@ -266,7 +271,7 @@ input:focus, textarea:focus {
   z-index: -1;
 }
 
-/* Animations */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -301,7 +306,6 @@ input:focus, textarea:focus {
   animation: pulse 2s infinite;
 }
 
-/* Theme Toggle */
 .theme-toggle {
   position: fixed;
   bottom: 20px;
@@ -324,7 +328,7 @@ input:focus, textarea:focus {
   transform: scale(1.1);
 }
 
-/* Message Div */
+
 .messageDiv {
   padding: 1rem;
   margin-bottom: 1.5rem;
@@ -342,4 +346,11 @@ input:focus, textarea:focus {
 .messageDiv.error {
   background-color: #fee2e2;
   color: #b91c1c;
+}
+
+#college-logo{
+  vertical-align: middle;
+  height: 60px;
+  margin-right: 12px;
+  display: inline-block;
 }

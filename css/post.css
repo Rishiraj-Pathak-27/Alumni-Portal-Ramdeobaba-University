@@ -112,33 +112,7 @@ input:focus, textarea:focus {
 }
 
 /* 3D Form Effect */
-section#jobPost {
-  transform-style: preserve-3d;
-  perspective: 1000px;
-  transition: transform 0.5s ease;
-}
 
-section#jobPost:hover {
-  transform: translateY(-5px) rotateX(3deg);
-}
-
-section#jobPost::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, var(--primary), var(--accent));
-  z-index: -1;
-  border-radius: calc(var(--radius) + 2px);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-section#jobPost:hover::before {
-  opacity: 1;
-}
 
 /* Floating background elements */
 .bg-element {
