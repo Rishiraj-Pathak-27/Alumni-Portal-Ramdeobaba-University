@@ -108,9 +108,9 @@
 
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
-// Firebase configuration
+// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBrKpHWWJAwCrZZt2kS2VebZtPDLFwiCRA",
     authDomain: "alumni-portal-2.firebaseapp.com",
@@ -125,126 +125,178 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Fetch posts from Firebase
-const fetchPosts = async () => {
-    console.log("Fetching posts..."); // Debug: Check if function is called
-    const dbRef = ref(db);
-    try {
-        const snapshot = await get(child(dbRef, `USERS`));
-        if (snapshot.exists()) {
-            console.log("Data retrieved: ", snapshot.val()); // Debug: Log fetched data
-            displayPosts(snapshot.val());
-        } else {
-            console.log("No data available."); // Debug: Log when no data is found
-            document.getElementById("jobContainer").innerHTML = "<p>No job postings found.</p>";
+function showMessage(message, divId) {
+    var messageDiv = document.getElementById(divId);
+    messageDiv.style.display = "block";
+    messageDiv.innerHTML = message;
+    messageDiv.style.opacity = 1;
+    setTimeout(function() {
+        messageDiv.style.opacity = 0;
+    }, 5000);
+}
+
+function showSuccessWithTimer() {
+    const formMessage = document.getElementById('formMessage') || document.getElementById('jobPost');
+    
+    if (!formMessage) return;
+    
+    // Create timer and redirect elements
+    let countdown = 5;
+    
+    // Initial success message
+    formMessage.innerHTML = `
+        <div style="text-align: center;">
+            <p style="color: green; font-weight: bold; margin-bottom: 10px;">Job post created successfully!</p>
+            <p>Redirecting to job posts in <span id="countdown">${countdown}</span> seconds...</p>
+            <button id="visitNowBtn" style="
+                background-color: #007bff; 
+                color: white; 
+                border: none; 
+                padding: 8px 16px; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                margin-top: 10px;
+                font-size: 14px;
+            ">Visit Job Posts Now</button>
+        </div>
+    `;
+    
+    formMessage.style.display = "block";
+    formMessage.style.opacity = "1";
+    
+    // Add click handler for immediate redirect
+    document.getElementById('visitNowBtn').addEventListener('click', function() {
+        window.location.href = 'jobs.html';
+    });
+    
+    // Start countdown timer
+    const timer = setInterval(function() {
+        countdown--;
+        const countdownElement = document.getElementById('countdown');
+        if (countdownElement) {
+            countdownElement.textContent = countdown;
         }
-    } catch (error) {
-        console.error("Error fetching data:", error); // Debug: Log errors
+        
+        if (countdown <= 0) {
+            clearInterval(timer);
+            window.location.href = 'jobs.html';
+        }
+    }, 1000);
+    
+    // Clear message after redirect (backup)
+    setTimeout(() => {
+        if (formMessage) {
+            formMessage.innerHTML = '';
+            formMessage.style.display = "none";
+        }
+    }, 6000);
+}
+
+// Firebase submission handler
+document.getElementById("submit").addEventListener('click', function (e) {
+    e.preventDefault();
+    
+    const jobTitle = document.getElementById("jobTitle").value;
+    const companyName = document.getElementById("companyName").value;
+    const jobDescription = document.getElementById("jobDescription").value;
+    const location = document.getElementById("location").value;
+    const applyLink = document.getElementById("applyLink").value;
+    
+    // Save to Firebase
+    set(ref(db, 'USERS/' + jobTitle), {
+        jobTitle: jobTitle,
+        companyName: companyName,
+        jobDescription: jobDescription,
+        location: location,
+        applyLink: applyLink
+    });
+    
+    // Also save to localStorage as backup
+    const newPost = {
+        jobTitle,
+        companyName,
+        jobDescription,
+        location,
+        applyLink,
+    };
+    
+    const existingPosts = JSON.parse(localStorage.getItem('jobPosts')) || [];
+    existingPosts.push(newPost);
+    localStorage.setItem('jobPosts', JSON.stringify(existingPosts));
+    
+    // Reset form
+    document.getElementById("jobPostForm").reset();
+    
+    // Show success message with timer
+    showSuccessWithTimer();
+});
+
+// Alternative form handler (if using different submit method)
+document.getElementById('jobPostForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    
+    const jobTitle = document.getElementById('jobTitle').value;
+    const companyName = document.getElementById('companyName').value;
+    const jobDescription = document.getElementById('jobDescription').value;
+    const location = document.getElementById('location').value;
+    const applyLink = document.getElementById('applyLink').value;
+    
+    // Create a job post object
+    const newPost = {
+        jobTitle,
+        companyName,
+        jobDescription,
+        location,
+        applyLink,
+    };
+    
+    // Save to localStorage
+    const existingPosts = JSON.parse(localStorage.getItem('jobPosts')) || [];
+    existingPosts.push(newPost);
+    localStorage.setItem('jobPosts', JSON.stringify(existingPosts));
+    
+    // Also save to Firebase if available
+    if (db) {
+        set(ref(db, 'USERS/' + jobTitle), newPost);
     }
-};
-
-// Display posts
-const displayPosts = (posts) => {
-    const jobContainer = document.getElementById("jobContainer");
-    jobContainer.innerHTML = ""; // Clear any existing content
-
-    for (const key in posts) {
-        const post = posts[key];
-        const jobCard = document.createElement("div");
-        jobCard.classList.add("job-card");
-        jobCard.innerHTML = `
-            <h3>${post.jobTitle}</h3>
-            <p><strong>Company:</strong> ${post.companyName}</p>
-            <p><strong>Description:</strong> ${post.jobDescription}</p>
-            <p><strong>Location:</strong> ${post.location}</p>
-            <a href="${post.applyLink}" target="_blank">Application</a>
-        `;
-        jobContainer.appendChild(jobCard);
-    }
-};
-
-// Trigger fetch on page load
-document.addEventListener("DOMContentLoaded", fetchPosts);
-
+    
+    // Reset the form
+    document.getElementById('jobPostForm').reset();
+    
+    // Show success message with timer
+    showSuccessWithTimer();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     // Load 3D background and theme toggle
     loadScript('js/3d-background.js');
     loadScript('js/theme-toggle.js');
     
-    
-    const sampleJobs = [
-      {
-        id: 1,
-        title: 'Software Engineer',
-        company: 'Tech Innovations Inc.',
-        description: 'We are looking for a skilled software engineer to join our team...',
-        location: 'Nagpur, India',
-        date: '2024-03-15',
-        applyLink: '#'
-      },
-      {
-        id: 2,
-        title: 'Data Scientist',
-        company: 'Analytics Pro',
-        description: 'Join our data science team to work on cutting-edge AI projects...',
-        location: 'Remote',
-        date: '2024-03-20',
-        applyLink: '#'
-      }
-    ];
-    
-    // Render jobs
-    const jobContainer = document.getElementById('jobContainer');
-    if (jobContainer) {
-      if (sampleJobs.length > 0) {
-        sampleJobs.forEach((job, index) => {
-          const jobCard = document.createElement('div');
-          jobCard.className = 'job-card';
-          jobCard.style.animationDelay = `${index * 0.1}s`;
-          
-          jobCard.innerHTML = `
-            <h3 class="job-title">${job.title}</h3>
-            <div class="company-name">${job.company}</div>
-            <p class="job-description">${job.description}</p>
-            <div class="job-meta">
-              <div class="job-location">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                ${job.location}
-              </div>
-              <div class="job-date">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                Posted on ${formatDate(job.date)}
-              </div>
-            </div>
-            <a href="${job.applyLink}" class="btn">Apply Now</a>
-          `;
-          
-          jobContainer.appendChild(jobCard);
+    // Form animation
+    const form = document.querySelector('form');
+    if (form) {
+        form.classList.add('fade-in');
+        
+        // Add input focus animations
+        const inputs = form.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', () => {
+                if (!input.value) {
+                    input.parentElement.classList.remove('focused');
+                }
+            });
         });
-      } else {
-        jobContainer.innerHTML = `
-          <div class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <h3>No job postings yet</h3>
-            <p>Be the first to post a job opportunity</p>
-          </div>
-        `;
-      }
     }
-  });
-  
-  // Format date helper
-  function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  }
-  
-  // Helper function to load scripts
-  function loadScript(src) {
+});
+
+// Helper function to load scripts
+function loadScript(src) {
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
     document.body.appendChild(script);
-  }
-  
+}
